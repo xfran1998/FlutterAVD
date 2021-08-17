@@ -1,0 +1,1 @@
+Route: D:\Programas\android-sdk\emulator

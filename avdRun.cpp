@@ -7,11 +7,14 @@
 #include <windows.h>
 
 void SetLocation();
-void GetLocation(std::string* cmd);
+void GetLocation(std::string& cmd);
+void SetCommand(std::string& cmd, const std::string& flag, const std::string& param = "");
 std::string Exec(const char* cmd); 
 bool ValidOption(int option, int maxSize);
 void SplitAVD(std::vector<std::string>& avdDevices, std::string output);
 void ShowAvdDevices(std::vector<std::string> avdDevices);
+
+const std::string flags[] = {"-list-avds", "-avd"};
 
 int main()
 {
@@ -21,7 +24,16 @@ int main()
 	
 	try
 	{
-		std::string output = Exec("D: && cd D:\\Programas\\android-sdk\\emulator && emulator -list-avds");
+		std::string cmd;
+		std::string output;
+		
+		// Getting the cmd command from 
+		GetLocation(cmd);
+		
+		SetCommand(cmd, flags[0]);
+		
+		// Getting output
+		output = Exec(cmd.c_str());
 		
 		// Spliting all the Android devices for later choose
 		SplitAVD(avdDevices, output);
@@ -42,9 +54,9 @@ int main()
 			
 			if (ValidOption(option, avdDevices.size()))
 			{
-				std::string runAvd = "D: && cd D:\\Programas\\android-sdk\\emulator && emulator -avd " + avdDevices[option];
-				ShowWindow(GetConsoleWindow(), SW_HIDE);
-				system(runAvd.c_str());
+				SetCommand(cmd, flags[1], avdDevices[option]);
+				ShowWindow(GetConsoleWindow(), SW_HIDE); // Hide console
+				system(cmd.c_str()); // Executing emulator
 			}
 			else
 			{
@@ -72,8 +84,8 @@ void SetLocation()
 		std::ofstream fOut("avdSetting.txt", std::ofstream::out);
 		std::string emulatorRoute;
 		
-		std::cout << "Note: YOU CAN CHANGE this route on ( avdSetting.txt ) if you get it wrong";
-		//std::cout << "in case you want to change it manually you should use \\\\ instead of \\\n\n";
+		std::cout << "Note: YOU CAN CHANGE this route on ( avdSetting.txt ) if you get it wrong\n";
+		std::cout << "Remember to leave space -> Route: D:\\Programas\\android-sdk\\emulator\n\n";
 		
 		std::cout << "What is the route of the emulator?" << std::endl;
 		std::cout << "Example: D:\\Programas\\android-sdk\\emulator" << std::endl;
@@ -81,20 +93,52 @@ void SetLocation()
 		std::cout << "Route: ";
 		getline(std::cin, emulatorRoute);
 		
-		// Debug
-		std::cout << "Route: " << emulatorRoute << std::endl;
-		while(true);
-		
 		// Erasing posible white space on the first char
 		int spaceIndex = emulatorRoute.find(' ');
-		while(spaceIndex != 0)
+		while(spaceIndex == 0)
 		{
 			emulatorRoute.erase(emulatorRoute.begin());
 			spaceIndex = emulatorRoute.find(' ');
 		}
 		
 		fOut << "Route: " << emulatorRoute;
+		
+		fOut.close();
 	}
+	
+	// D:\Programas\nandroid-sdk\remulator TEST \n, \r and ' '
+	// D:\Programas\android-sdk\emulator 
+}
+
+void GetLocation(std::string& cmd)
+{
+	std::fstream file;
+	file.open("avdSetting.txt");
+	
+	if (file.fail())
+	{
+		throw std::runtime_error("File ( avdSetting.txt ) doesn't exist!!!'");
+	}
+	else
+	{
+		std::ifstream fIn("avdSetting.txt", std::ifstream::in);
+		
+		getline(fIn, cmd);
+		
+		// Erasing "Route: "
+		cmd.erase(0, cmd.find(' ')+1);
+	}
+}
+
+void SetCommand(std::string& cmd, const std::string& flag, const std::string& param)
+{
+	// Example: "D: && cd D:\\Programas\\android-sdk\\emulator && emulator -list-avds"	
+	std::string command = "";
+	
+	command.push_back(cmd[0]);
+	command += ": && cd " + cmd + " && emulator " + flag + " " + param;
+	
+	cmd = command;
 }
 
 /*
@@ -132,7 +176,7 @@ bool ValidOption(int option, int maxSize)
 
 void ShowAvdDevices(std::vector<std::string> avdDevices)
 {
-	for (int i=0; i < avdDevices.size(); i++)
+	for (unsigned int i=0; i < avdDevices.size(); i++)
 	{
 		std::cout << i << ") " << avdDevices[i] << std::endl;
 	}
