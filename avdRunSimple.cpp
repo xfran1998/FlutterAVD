@@ -5,6 +5,7 @@
 
 int main()
 {
+	// Hide console
 	ShowWindow(GetConsoleWindow(), SW_HIDE);
 	
 	// Change the route and the android device for what ever you want to use
