@@ -1,3 +1,5 @@
+Change from 2-3 min startup emulator open android studio every time you want to test your apps to 2 sec.
+
 You can use or change the program as you want.
 
 You can downlaod avdRun.exe so you don't have to compile the file, I may migrate the code to classes if needed in the future so this will be easer than compiling the project.
