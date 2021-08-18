@@ -1,4 +1,4 @@
-Change from 2-3 min startup emulator open android studio every time you want to test your apps to 2 sec.
+Change from 2-3 min startup emulator opening android studio every time you want to test your apps to 2 sec.
 
 You can use or change the program as you want.
 
